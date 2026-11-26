@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: 2026 boob.yang
+name: SCN-04 merge with optional evidence
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        type: number
+        required: true
+      head_sha:
+        type: string
+        required: true
+      phase:
+        type: choice
+        required: true
+        options: [missing, bare-skipped, old-scope, failed-build, bound-waiver]
+permissions:
+  contents: read
+  pull-requests: read
+  checks: write
+jobs:
+  run:
+    if: >-
+      github.repository == 'yangbobo2021/anthropic-sdlc-check-source-lab' &&
+      github.ref == 'refs/heads/main' &&
+      github.ref_protected &&
+      github.actor == 'yangbobo2021'
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.workflow_sha }}
+          persist-credentials: false
+      - name: Publish fixture inputs and run the delivered adapter
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SDLC_WORKFLOW_SHA: ${{ github.workflow_sha }}
+        run: python3 .qa/scn04-optional/drive.py
