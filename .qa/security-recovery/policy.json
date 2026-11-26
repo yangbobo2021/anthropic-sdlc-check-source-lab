@@ -1,0 +1,10 @@
+{
+  "security_review": {
+    "name": "synthetic-security-recovery-evidence",
+    "app_id": 15368,
+    "blocking_severities": [
+      "critical",
+      "high"
+    ]
+  }
+}
