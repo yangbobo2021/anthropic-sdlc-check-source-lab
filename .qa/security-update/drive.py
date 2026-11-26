@@ -12,8 +12,10 @@ from tempfile import TemporaryDirectory
 
 HERE = Path(__file__).resolve().parent
 RECOVERY = HERE.parent / "security-recovery"
-DELIVERY = RECOVERY / "delivery"
+DELIVERY = HERE / "delivery"
 sys.path.insert(0, str(RECOVERY))
+sys.path.insert(0, str(DELIVERY))
+from github_evidence import current_security_checks
 import drive as recovery
 
 REPO, APP, DECISION = recovery.REPO, recovery.APP, recovery.DECISION
@@ -78,7 +80,7 @@ def main():
     all_reports = recovery.await_value(refreshed, "Report update not visible")
     latest = recovery.api(f"repos/{REPO}/commits/{head}/check-runs"
                           f"?check_name={SOURCE}&app_id={APP}&filter=latest&per_page=100")
-    selected = recovery.last_check(REPO, head, SOURCE, APP)
+    selected, = current_security_checks(REPO, head, SOURCE, APP)
     policy = {"security_review": {"name": SOURCE, "app_id": APP,
                                   "blocking_severities": ["critical", "high"]}}
     with TemporaryDirectory() as temp:
