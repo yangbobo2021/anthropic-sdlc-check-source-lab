@@ -1,0 +1,37 @@
+name: Synthetic security check provenance
+on:
+  check_run:
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Open synthetic pull request number
+        required: true
+        type: number
+      mode:
+        description: Provenance check mode
+        required: true
+        type: choice
+        options: [wrong-source, native-readback]
+permissions:
+  contents: read
+  pull-requests: read
+  checks: write
+jobs:
+  inspect:
+    if: >-
+      github.repository == 'yangbobo2021/anthropic-sdlc-check-source-lab' &&
+      github.ref == 'refs/heads/main' && github.ref_protected &&
+      (github.event.check_run.app.id == 57789 ||
+       (github.event_name == 'workflow_dispatch' && github.actor == 'yangbobo2021'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Observe the real check or exercise the current PR report
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 probe/verify.py
