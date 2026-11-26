@@ -5,6 +5,9 @@ name: Check the merge group commit
     types:
     - checks_requested
   workflow_dispatch:
+  pull_request:
+    branches: [sdlc0062-native-combination]
+    types: [opened, synchronize, reopened]
 permissions:
   contents: read
 jobs:
